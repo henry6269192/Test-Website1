@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nova Studio – Digital Experiences</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --accent: #c8f04a;
+      --accent2: #6e57ff;
+      --text: #f0ede8;
+      --muted: #888;
+      --border: rgba(255,255,255,0.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 4rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      background: rgba(10,10,15,0.7);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent);
+      color: #0a0a0f;
+      padding: 0.6rem 1.4rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10rem 4rem 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-blob {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .blob1 { background: var(--accent2); top: -200px; right: -200px; animation: drift 8s ease-in-out infinite alternate; }
+    .blob2 { background: var(--accent); bottom: -300px; left: -100px; animation: drift 11s ease-in-out infinite alternate-reverse; }
+    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px, 30px) scale(1.05); } }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.4s forwards;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s forwards;
+    }
+    .hero-actions {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0f;
+      padding: 0.9rem 2.2rem;
+      border-radius: 3rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+    .btn-ghost {
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); }
+    .btn-ghost svg { transition: transform 0.2s; }
+    .btn-ghost:hover svg { transform: translateX(4px); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 0;
+      background: var(--surface);
+    }
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-track span {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .marquee-track span b { color: var(--accent); margin-right: 3rem; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* SERVICES */
+    section { padding: 8rem 4rem; }
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 4rem;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5px;
+      border: 1.5px solid var(--border);
+    }
+    .service-card {
+      padding: 3rem 2.5rem;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent2)22, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover { background: #16161f; }
+    .service-card:hover::after { opacity: 1; }
+    .service-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .service-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+    /* WORK */
+    .work-section { background: var(--surface); }
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .work-card {
+      border-radius: 1rem;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4/3;
+      cursor: pointer;
+    }
+    .work-card-bg {
+      width: 100%; height: 100%;
+      transition: transform 0.5s;
+    }
+    .work-card:hover .work-card-bg { transform: scale(1.05); }
+    .work-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+    }
+    .work-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .work-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+
+    /* PRICING */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .price-card {
+      border: 1.5px solid var(--border);
+      border-radius: 1.2rem;
+      padding: 2.5rem 2rem;
+      background: var(--surface);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .price-card:hover { border-color: var(--accent2); transform: translateY(-6px); }
+    .price-card.featured {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #1a1a2e, #111118);
+    }
+    .price-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .price-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .price-amount span { font-size: 1.2rem; color: var(--muted); }
+    .price-features {
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .price-features li {
+      list-style: none;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .price-features li::before { content: '✦'; color: var(--accent); font-size: 0.6rem; }
+    .price-btn {
+      display: block;
+      text-align: center;
+      padding: 0.85rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .price-btn:hover, .price-card.featured .price-btn {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0a0a0f;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer p { color: var(--muted); font-size: 0.85rem; }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a { color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      section, .hero { padding-left: 1.5rem; padding-right: 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Nova<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob blob1"></div>
+  <div class="hero-blob blob2"></div>
+  <span class="hero-label">✦ Web Studio for Founders</span>
+  <h1>We build sites that <em>convert.</em></h1>
+  <p class="hero-sub">Beautiful, fast, high-converting websites for modern businesses. Designed in days, not months.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">See Packages</a>
+    <a href="#work" class="btn-ghost">View our work <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>Landing Pages <b>✦</b></span><span>E-Commerce <b>✦</b></span><span>Brand Sites <b>✦</b></span><span>Portfolios <b>✦</b></span><span>SaaS Pages <b>✦</b></span><span>Restaurants <b>✦</b></span><span>Law Firms <b>✦</b></span><span>Real Estate <b>✦</b></span>
+    <span>Landing Pages <b>✦</b></span><span>E-Commerce <b>✦</b></span><span>Brand Sites <b>✦</b></span><span>Portfolios <b>✦</b></span><span>SaaS Pages <b>✦</b></span><span>Restaurants <b>✦</b></span><span>Law Firms <b>✦</b></span><span>Real Estate <b>✦</b></span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <p class="section-label">What we do</p>
+  <h2 class="section-title">Everything your site needs</h2>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-number">01</div>
+      <h3>Strategy & Design</h3>
+      <p>We map your audience, define your positioning, then craft a visual identity that commands attention.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-number">02</div>
+      <h3>Development</h3>
+      <p>Clean, fast, accessible code. No bloated page builders — just lean HTML/CSS or modern frameworks.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-number">03</div>
+      <h3>Copywriting</h3>
+      <p>Words that sell. We write headlines, CTAs, and body copy engineered to move visitors to action.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-number">04</div>
+      <h3>Launch & Hosting</h3>
+      <p>We deploy to a custom domain, set up SSL, and hand you the keys with full documentation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work" class="work-section">
+  <p class="section-label">Portfolio</p>
+  <h2 class="section-title">Recent work</h2>
+  <div class="work-grid">
+    <div class="work-card">
+      <div class="work-card-bg" style="background: linear-gradient(135deg, #1a0533, #6e57ff, #c8f04a);"></div>
+      <div class="work-card-overlay">
+        <span class="work-tag">SaaS</span>
+        <h3>Pulse Analytics</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg" style="background: linear-gradient(135deg, #0d2b1a, #1a7a4a, #c8f04a);"></div>
+      <div class="work-card-overlay">
+        <span class="work-tag">E-Commerce</span>
+        <h3>Verd Botanicals</h3>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg" style="background: linear-gradient(135deg, #1a0a0a, #7a1a2e, #ff6b6b);"></div>
+      <div class="work-card-overlay">
+        <span class="work-tag">Restaurant</span>
+        <h3>Ember Dining Co.</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <p class="section-label">Packages</p>
+  <h2 class="section-title">Simple, honest pricing</h2>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <p class="price-label">Starter</p>
+      <div class="price-amount">$499<span> /once</span></div>
+      <ul class="price-features">
+        <li>Single landing page</li>
+        <li>Mobile responsive</li>
+        <li>Custom domain setup</li>
+        <li>3 revision rounds</li>
+        <li>7-day delivery</li>
+      </ul>
+      <a href="#" class="price-btn">Get Started</a>
+    </div>
+    <div class="price-card featured">
+      <p class="price-label">✦ Most Popular</p>
+      <div class="price-amount">$1,200<span> /once</span></div>
+      <ul class="price-features">
+        <li>Up to 5 pages</li>
+        <li>Custom animations</li>
+        <li>SEO foundations</li>
+        <li>Contact form + CRM</li>
+        <li>Unlimited revisions</li>
+        <li>14-day delivery</li>
+      </ul>
+      <a href="#" class="price-btn">Get Started</a>
+    </div>
+    <div class="price-card">
+      <p class="price-label">Agency</p>
+      <div class="price-amount">$3,500<span>+</span></div>
+      <ul class="price-features">
+        <li>Full custom build</li>
+        <li>E-commerce or SaaS</li>
+        <li>CMS integration</li>
+        <li>Analytics dashboard</li>
+        <li>3-month support</li>
+        <li>Priority delivery</li>
+      </ul>
+      <a href="#" class="price-btn">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="logo">Nova<span>.</span></div>
+  <p>© 2026 Nova Studio. Built with Claude.</p>
+  <div class="footer-links">
+    <a href="#">Twitter</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">Email</a>
+  </div>
+</footer>
+
+</body>
+</html>
